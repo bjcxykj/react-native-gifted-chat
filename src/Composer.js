@@ -9,6 +9,21 @@ import Color from './Color';
 
 export default class Composer extends React.Component {
 
+  shouldComponentUpdate(nextProps){
+    return Platform.OS !== 'ios' || this.compareInputText(this.props.text, nextProps.text);
+  }
+
+  compareInputText(currentText, nextText){
+    if (currentText === nextText) {
+      return true
+    }
+    const reg = /\[*.?\]/
+    if (currentText === '') {
+      return reg.test(nextText)
+    }
+    return reg.test(nextText.split(currentText)[1])
+  }
+
   onContentSizeChange(e) {
     const { contentSize } = e.nativeEvent;
 
@@ -32,9 +47,6 @@ export default class Composer extends React.Component {
   render() {
     return (
       <TextInput
-        testID={this.props.placeholder}
-        accessible
-        accessibilityLabel={this.props.placeholder}
         placeholder={this.props.placeholder}
         placeholderTextColor={this.props.placeholderTextColor}
         multiline={this.props.multiline}
@@ -44,6 +56,7 @@ export default class Composer extends React.Component {
         style={[styles.textInput, this.props.textInputStyle, { height: this.props.composerHeight }]}
         autoFocus={this.props.textInputAutoFocus}
         value={this.props.text}
+        accessibilityLabel={this.props.text || this.props.placeholder}
         enablesReturnKeyAutomatically
         underlineColorAndroid="transparent"
         keyboardAppearance={this.props.keyboardAppearance}
